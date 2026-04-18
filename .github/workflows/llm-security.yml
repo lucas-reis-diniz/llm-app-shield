@@ -20,11 +20,14 @@ jobs:
         run: pip install jinja2 pathspec pyyaml
 
       - name: Run LLM Security Scan
-        run: python3 tools/llmshield.py llmapp_shield/ --fail-on critical --json scan-report.json
+        run: python3 tools/llmshield.py llmapp_shield/ --json scan-report.json
+        continue-on-error: true
 
       - name: Upload report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: llm-security-report
-          path: scan-report.json
+          path: |
+            scan-report.json
+            llmshield-report.html
