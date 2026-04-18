@@ -228,7 +228,7 @@ def rules(
 
     if format == "json":
         import json
-        rprint(json.dumps([r.model_dump() for r in all_rules], indent=2))
+        print(json.dumps([r.model_dump() for r in all_rules], indent=2))
         return
 
     table = Table(
