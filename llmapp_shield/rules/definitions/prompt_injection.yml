@@ -1,0 +1,93 @@
+# llmapp_shield/rules/definitions/prompt_injection.yml
+# OWASP LLM01 — Prompt Injection Rules
+
+rules:
+  - id: LLM01-LANGCHAIN-RUNNABLE-001
+    name: LangChain LCEL Chain with Unvalidated Input
+    category: prompt_injection
+    severity: high
+    language: python
+    description: >
+      A LangChain LCEL chain invokes the LLM with input that may not be validated.
+      Ensure that user-controlled variables are sanitized before passing to chain.invoke().
+    description_pt: >
+      Uma chain LCEL do LangChain invoca o LLM com entrada que pode não estar validada.
+      Garanta que variáveis controladas pelo usuário sejam sanitizadas antes de chain.invoke().
+    pattern: 'chain\.invoke\(\{["\'](?:input|query|question|human_input)["\']:\s*(?:user_input|request|query|message)\}'
+    pattern_type: regex
+    recommendation: >
+      Validate and sanitize all user inputs before passing to LangChain chains.
+      Use Pydantic validators on your input schemas.
+    recommendation_pt: >
+      Valide e sanitize todas as entradas do usuário antes de passar para chains do LangChain.
+      Use validadores Pydantic nos seus schemas de entrada.
+    fix_example: |
+      from pydantic import BaseModel, field_validator
+
+      class UserQuery(BaseModel):
+          question: str
+
+          @field_validator("question")
+          @classmethod
+          def validate_question(cls, v: str) -> str:
+              if len(v) > 2000:
+                  raise ValueError("Query too long")
+              return v.strip()
+
+      validated = UserQuery(question=user_input)
+      result = chain.invoke({"input": validated.question})
+    owasp_id: LLM01
+    owasp_name: Prompt Injection
+    confidence: 0.75
+    enabled: true
+    tags:
+      - prompt-injection
+      - langchain
+      - lcel
+    references:
+      - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+
+  - id: LLM01-OPENAI-SYSTEM-OVERRIDE-001
+    name: OpenAI System Message Potentially Overridable
+    category: prompt_injection
+    severity: high
+    language: python
+    description: >
+      The OpenAI API call structure may allow user input to interfere with
+      the system message, enabling system prompt override attacks.
+    description_pt: >
+      A estrutura da chamada da API OpenAI pode permitir que entrada do usuário
+      interfira com a mensagem de sistema, permitindo ataques de sobrescrita do prompt.
+    pattern: 'messages\s*=\s*\[\s*\{[^}]*"role"\s*:\s*"system"[^}]*\}[^]]*\{[^}]*"role"\s*:\s*"user"[^}]*f["\']'
+    pattern_type: regex
+    recommendation: >
+      Always use structured message arrays. Never build message content with f-strings.
+      The user role content should come from validated input, not f-string interpolation.
+    owasp_id: LLM01
+    owasp_name: Prompt Injection
+    confidence: 0.80
+    enabled: true
+    tags:
+      - prompt-injection
+      - openai
+      - system-message
+
+  - id: LLM01-TEMPLATE-INJECTION-001
+    name: Jinja2 Template Injection via User Input
+    category: prompt_injection
+    severity: critical
+    language: python
+    description: >
+      User input is passed directly to Jinja2 template rendering, enabling
+      Server-Side Template Injection (SSTI) which can lead to RCE.
+    pattern: 'Environment\(\)\.from_string\((?:user_input|request|query|message)\)'
+    pattern_type: regex
+    recommendation: Use Jinja2 with sandboxed environment and never render user input as a template.
+    owasp_id: LLM01
+    owasp_name: Prompt Injection
+    confidence: 0.90
+    enabled: true
+    tags:
+      - ssti
+      - template-injection
+      - prompt-injection

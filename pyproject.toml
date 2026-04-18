@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llmapp-shield"
+version = "0.1.0"
+description = "AI Security Scanner for LLM Applications — OWASP LLM Top 10"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "LLMAppShield Contributors", email = "security@llmappshield.dev" },
+]
+keywords = ["security", "llm", "ai", "owasp", "scanner", "prompt-injection"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pydantic>=2.6.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0.1",
+    "httpx>=0.27.0",
+    "libcst>=1.3.0",
+    "pathspec>=0.12.1",
+    "click>=8.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.9.0",
+    "types-pyyaml>=6.0.0",
+]
+llm = [
+    "httpx>=0.27.0",
+]
+streamlit = [
+    "streamlit>=1.35.0",
+    "plotly>=5.20.0",
+]
+
+[project.scripts]
+llmapp-shield = "llmapp_shield.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/llmappshield/llmapp-shield"
+Documentation = "https://llmappshield.dev/docs"
+Repository = "https://github.com/llmappshield/llmapp-shield"
+Issues = "https://github.com/llmappshield/llmapp-shield/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["llmapp_shield"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=llmapp_shield --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["llmapp_shield"]
+omit = ["tests/*"]

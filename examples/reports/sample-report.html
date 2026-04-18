@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LLMAppShield Security Report</title>
+<style>
+:root{--bg:#0f1117;--s:#1a1d2e;--s2:#252840;--b:#2d3158;--t:#e2e8f0;--m:#94a3b8;--a:#6366f1}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;line-height:1.6}
+.nav{background:var(--s);border-bottom:1px solid var(--b);padding:1rem 2rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100}
+.logo{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{padding:.2rem .6rem;border-radius:999px;font-size:.72rem;font-weight:600;background:var(--s2);border:1px solid var(--b)}
+.wrap{max-width:1100px;margin:0 auto;padding:2rem}
+h1{font-size:1.7rem;font-weight:800;margin:2rem 0 .5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.9rem;margin-bottom:2rem}
+.card{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:1.3rem;text-align:center}
+.num{font-size:2.2rem;font-weight:800;line-height:1}
+.lbl{color:var(--m);font-size:.75rem;margin-top:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.btn{padding:.35rem .9rem;border-radius:999px;border:1px solid var(--b);background:var(--s);color:var(--t);cursor:pointer;font-size:.82rem;transition:all .15s}
+.btn:hover,.btn.on{border-color:var(--a);background:var(--a)}
+.card2{background:var(--s);border:1px solid var(--b);border-radius:12px;margin-bottom:.9rem;overflow:hidden}
+.hdr{padding:.9rem 1.3rem;display:flex;align-items:center;gap:.9rem;cursor:pointer;user-select:none}
+.sbadge{padding:.2rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700;text-transform:uppercase}
+.ftitle{font-weight:600;flex:1}
+.fmeta{color:var(--m);font-size:.78rem}
+.body{padding:0 1.3rem 1.3rem;display:none}
+.open .body{display:block}
+.loc{background:var(--s2);border-radius:8px;padding:.65rem 1rem;margin-bottom:.9rem;font-family:monospace;font-size:.82rem;color:#06b6d4}
+.code{background:#1e1e2e;border-radius:8px;padding:.9rem;font-family:monospace;font-size:.78rem;overflow-x:auto;white-space:pre;margin:.7rem 0;border:1px solid var(--b)}
+.dl{color:var(--a);font-size:.75rem;font-weight:600;text-transform:uppercase;margin:.8rem 0 .3rem}
+.fix{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:.65rem 1rem;font-size:.88rem}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;background:var(--s2);border:1px solid var(--b);margin:.2rem .1rem}
+.chev{transition:transform .2s;flex-shrink:0}
+.open .chev{transform:rotate(180deg)}
+footer{text-align:center;color:var(--m);font-size:.78rem;padding:3rem 0 2rem;border-top:1px solid var(--b);margin-top:3rem}
+a{color:var(--a)}
+</style></head>
+<body>
+<nav class="nav">
+  <span class="logo">🛡️ LLMAppShield</span>
+  <span class="badge">v0.1.0</span>
+  <span class="badge">OWASP LLM Top 10</span>
+</nav>
+<div class="wrap">
+  <h1>Security Report</h1>
+  <p style="color:var(--m);margin-bottom:1.5rem">3 files scanned &nbsp;·&nbsp; 24 findings</p>
+  <div class="grid">
+    <div class="card" style="border-color:#ef444440"><div class="num" style="color:#ef4444">15</div><div class="lbl">🔴 Critical</div></div>
+    <div class="card" style="border-color:#f9731640"><div class="num" style="color:#f97316">5</div><div class="lbl">🟠 High</div></div>
+    <div class="card" style="border-color:#eab30840"><div class="num" style="color:#eab308">4</div><div class="lbl">🟡 Medium</div></div>
+    <div class="card" style="border-color:#3b82f640"><div class="num" style="color:#3b82f6">0</div><div class="lbl">🔵 Low</div></div>
+    <div class="card"><div class="num" style="color:#6366f1">24</div><div class="lbl">Total</div></div>
+  </div>
+  <div class="filters">
+    <button class="btn on" onclick="filt('all',this)">All (24)</button>
+    <button class="btn" onclick="filt('critical',this)" style="color:#ef4444">🔴 Critical (15)</button>
+    <button class="btn" onclick="filt('high',this)" style="color:#f97316">🟠 High (5)</button>
+    <button class="btn" onclick="filt('medium',this)" style="color:#eab308">🟡 Medium (4)</button>
+    
+  </div>
+  <div id="fl">
+  
+  
+  <div class="card2" data-sev="critical" id="f1">
+    <div class="hdr" onclick="tog(1)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Excessive Agency: Agent Has Shell Execution Access</span>
+      <span class="fmeta">LLM08-SHELL-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:13 &nbsp;|&nbsp; LLM08 &nbsp;|&nbsp; conf:95%</div>
+      <div class="code">3. [LLM06-HIGH]     PII (user email + name) sent to LLM
+4. [LLM02-CRITICAL] LLM output executed with eval()
+5. [LLM08-CRITICAL] Agent with ShellTool (unrestricted shell access)
+6. [LLM06-MEDIUM]   LLM prompt/response logged to console
+&#34;&#34;&#34;</div>
+      <div class="dl">Description</div><div>A LangChain ShellTool is registered to the agent. This gives the LLM the ability to execute any shell command. If compromised via prompt injection, an attacker can run arbitrary OS commands.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Replace ShellTool with specific, allowlisted functions. Apply the principle of least privilege. Add human-in-the-loop approval for any destructive operations.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">excessive_agency</span><span class="tag">llm08</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f2">
+    <div class="hdr" onclick="tog(2)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Hardcoded OpenAI API Key</span>
+      <span class="fmeta">SEC-OPENAI-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:26 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:92%</div>
+      <div class="code">
+# ❌ VULNERABILITY 1: Hardcoded API key (LLM06 - CRITICAL)
+OPENAI_API_KEY = &#34;sk-abc123realapikeyexposedingithub&#34;
+os.environ[&#34;OPENAI_API_KEY&#34;] = OPENAI_API_KEY
+</div>
+      <div class="dl">Description</div><div>An OpenAI API key (sk-...) is hardcoded in the source code. Keys in source code are often accidentally committed to version control and exposed publicly.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Store API keys in environment variables or a secrets manager. Rotate any exposed key immediately.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">secret_exposure</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f3">
+    <div class="hdr" onclick="tog(3)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via f-string Interpolation</span>
+      <span class="fmeta">LLM01-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:49 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:90%</div>
+      <div class="code">
+    # ❌ VULNERABILITY 3: PII logged before LLM call (LLM06 - MEDIUM)
+    logger.info(f&#34;Calling LLM with prompt: {prompt}&#34;)
+
+    response = llm.invoke(prompt)</div>
+      <div class="dl">Description</div><div>User input is directly interpolated into a prompt string with an f-string. Attackers can craft malicious input to override system instructions, extract data, or hijack model behavior.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use ChatPromptTemplate.from_messages() with named slots instead of f-strings. Validate/sanitize user input before including in any prompt.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f4">
+    <div class="hdr" onclick="tog(4)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Excessive Agency: Agent Has Shell Execution Access</span>
+      <span class="fmeta">LLM08-SHELL-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:73 &nbsp;|&nbsp; LLM08 &nbsp;|&nbsp; conf:95%</div>
+      <div class="code">
+    # ShellTool gives the LLM access to execute ANY shell command
+    tools = [ShellTool()]  # CRITICAL: rm -rf / anyone?
+
+    agent = initialize_agent(</div>
+      <div class="dl">Description</div><div>A LangChain ShellTool is registered to the agent. This gives the LLM the ability to execute any shell command. If compromised via prompt injection, an attacker can run arbitrary OS commands.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Replace ShellTool with specific, allowlisted functions. Apply the principle of least privilege. Add human-in-the-loop approval for any destructive operations.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">excessive_agency</span><span class="tag">llm08</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f5">
+    <div class="hdr" onclick="tog(5)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via f-string Interpolation</span>
+      <span class="fmeta">LLM01-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:93 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:90%</div>
+      <div class="code">
+    # Ask LLM to generate SQL query
+    sql_prompt = f&#34;Generate a SQL query to: {user_input}&#34;
+    llm_generated_sql = llm.invoke(sql_prompt).content
+</div>
+      <div class="dl">Description</div><div>User input is directly interpolated into a prompt string with an f-string. Attackers can craft malicious input to override system instructions, extract data, or hijack model behavior.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use ChatPromptTemplate.from_messages() with named slots instead of f-strings. Validate/sanitize user input before including in any prompt.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f6">
+    <div class="hdr" onclick="tog(6)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via f-string Interpolation</span>
+      <span class="fmeta">LLM01-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:113 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:90%</div>
+      <div class="code">    from flask import render_template_string
+
+    response = llm.invoke(f&#34;Format this message as HTML: {user_message}&#34;)
+    llm_response = response.content
+</div>
+      <div class="dl">Description</div><div>User input is directly interpolated into a prompt string with an f-string. Attackers can craft malicious input to override system instructions, extract data, or hijack model behavior.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use ChatPromptTemplate.from_messages() with named slots instead of f-strings. Validate/sanitize user input before including in any prompt.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f7">
+    <div class="hdr" onclick="tog(7)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Direct LLM Call with f-string Argument</span>
+      <span class="fmeta">LLM01-004</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:113 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:87%</div>
+      <div class="code">    from flask import render_template_string
+
+    response = llm.invoke(f&#34;Format this message as HTML: {user_message}&#34;)
+    llm_response = response.content
+</div>
+      <div class="dl">Description</div><div>The LLM is invoked with an f-string argument. If the interpolated variable is user-controlled this is a direct prompt injection vulnerability.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Refactor to use PromptTemplate and pass user data as named variables, not embedded strings.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f8">
+    <div class="hdr" onclick="tog(8)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">XSS: LLM Output Rendered as Raw HTML</span>
+      <span class="fmeta">LLM02-XSS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:117 &nbsp;|&nbsp; LLM02 &nbsp;|&nbsp; conf:88%</div>
+      <div class="code">
+    # ❌ VULNERABILITY 7: LLM output rendered as raw HTML (XSS)
+    return render_template_string(llm_response)
+
+</div>
+      <div class="dl">Description</div><div>LLM-generated content is rendered as raw HTML. An attacker who can influence the model output (e.g., via indirect prompt injection) can inject malicious scripts.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use HTML templating with auto-escaping (Jinja2 autoescape=True). Never pass LLM output to render_template_string() or Markup().</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">insecure_output</span><span class="tag">llm02</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f9">
+    <div class="hdr" onclick="tog(9)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Hardcoded OpenAI Project API Key (TypeScript)</span>
+      <span class="fmeta">SEC-OPENAI-TS-002</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:17 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:94%</div>
+      <div class="code">// ❌ Hardcoded OpenAI API key (SEC-OPENAI - CRITICAL)
+const openai = new OpenAI({
+  apiKey: &#34;sk-proj-abc123realopenapikey987654321exposed&#34;,
+});
+</div>
+      <div class="dl">Description</div><div>An OpenAI Project API key is hardcoded in TypeScript source.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use environment variables. Never include secrets in client-side bundles.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">secret_exposure</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f10">
+    <div class="hdr" onclick="tog(10)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via TypeScript Template Literal</span>
+      <span class="fmeta">LLM01-TS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:38 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:88%</div>
+      <div class="code">      {
+        role: &#34;user&#34;,
+        content: `${userInput}`, // ❌ Direct template literal interpolation
+      },
+    ],</div>
+      <div class="dl">Description</div><div>User input is interpolated directly into a template literal used in an LLM API call.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use structured message arrays. Pass user content as a separate message object, not as part of a template literal.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f11">
+    <div class="hdr" onclick="tog(11)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via TypeScript Template Literal</span>
+      <span class="fmeta">LLM01-TS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:50 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:88%</div>
+      <div class="code">  const response = await openai.chat.completions.create({
+    model: &#34;gpt-4&#34;,
+    messages: [{ role: &#34;user&#34;, content: `Format as HTML: ${userMessage}` }],
+  });
+</div>
+      <div class="dl">Description</div><div>User input is interpolated directly into a template literal used in an LLM API call.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use structured message arrays. Pass user content as a separate message object, not as part of a template literal.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f12">
+    <div class="hdr" onclick="tog(12)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">XSS: LLM Output Set as innerHTML</span>
+      <span class="fmeta">LLM02-XSS-TS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:56 &nbsp;|&nbsp; LLM02 &nbsp;|&nbsp; conf:90%</div>
+      <div class="code">
+  // ❌ Setting innerHTML with LLM output — XSS attack vector!
+  document.getElementById(&#34;output&#34;)!.innerHTML = aiResponse;
+}
+</div>
+      <div class="dl">Description</div><div>LLM output is assigned to innerHTML without sanitization. This enables XSS if the model output contains malicious script tags.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use textContent instead of innerHTML. If HTML rendering is needed, use a sanitizer like DOMPurify.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">insecure_output</span><span class="tag">llm02</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f13">
+    <div class="hdr" onclick="tog(13)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">RCE: LLM Output Passed to eval()/Function()</span>
+      <span class="fmeta">LLM02-EVAL-TS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:71 &nbsp;|&nbsp; LLM02 &nbsp;|&nbsp; conf:93%</div>
+      <div class="code">
+  // ❌ Executing LLM-generated code — Remote Code Execution!
+  eval(generatedCode); // NEVER DO THIS
+}
+</div>
+      <div class="dl">Description</div><div>LLM output is executed as JavaScript via eval() or Function(). This is a critical code execution vulnerability.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Never execute LLM output as code. Use structured output formats (JSON) and process them safely.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">insecure_output</span><span class="tag">llm02</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f14">
+    <div class="hdr" onclick="tog(14)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Prompt Injection via TypeScript Template Literal</span>
+      <span class="fmeta">LLM01-TS-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/openai_app.ts:78 &nbsp;|&nbsp; LLM01 &nbsp;|&nbsp; conf:88%</div>
+      <div class="code">  const response = await openai.chat.completions.create({
+    model: &#34;gpt-4&#34;,
+    messages: [{ role: &#34;user&#34;, content: `Generate SQL query for: ${userInput}` }],
+  });
+</div>
+      <div class="dl">Description</div><div>User input is interpolated directly into a template literal used in an LLM API call.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use structured message arrays. Pass user content as a separate message object, not as part of a template literal.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">prompt_injection</span><span class="tag">llm01</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="critical" id="f15">
+    <div class="hdr" onclick="tog(15)">
+      <span class="sbadge" style="background:#ef444420;color:#ef4444;border:1px solid #ef444440">
+        🔴 CRITICAL
+      </span>
+      <span class="ftitle">Hardcoded Anthropic API Key</span>
+      <span class="fmeta">SEC-ANTHROPIC-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/rag_app.py:23 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:93%</div>
+      <div class="code">
+# ❌ Hardcoded Anthropic API key (SEC-ANTHROPIC - CRITICAL)
+client = Anthropic(api_key=&#34;sk-ant-api03-realexposedkey12345678&#34;)
+
+# Global vector store (shared across all users — no tenant isolation)</div>
+      <div class="dl">Description</div><div>An Anthropic API key (sk-ant-...) is hardcoded in the source code. This credential can be extracted from the repository and used for unauthorized LLM access.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use os.environ[&#39;ANTHROPIC_API_KEY&#39;] or python-dotenv. Rotate exposed keys immediately.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">secret_exposure</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="high" id="f16">
+    <div class="hdr" onclick="tog(16)">
+      <span class="sbadge" style="background:#f9731620;color:#f97316;border:1px solid #f9731640">
+        🟠 HIGH
+      </span>
+      <span class="ftitle">Hardcoded API Key or Token</span>
+      <span class="fmeta">SEC-GENERIC-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:26 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:82%</div>
+      <div class="code">
+# ❌ VULNERABILITY 1: Hardcoded API key (LLM06 - CRITICAL)
+OPENAI_API_KEY = &#34;sk-abc123realapikeyexposedingithub&#34;
+os.environ[&#34;OPENAI_API_KEY&#34;] = OPENAI_API_KEY
+</div>
+      <div class="dl">Description</div><div>A generic API key or token appears to be hardcoded in source code.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use environment variables or a secrets manager. Never commit credentials to version control.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">secret_exposure</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="high" id="f17">
+    <div class="hdr" onclick="tog(17)">
+      <span class="sbadge" style="background:#f9731620;color:#f97316;border:1px solid #f9731640">
+        🟠 HIGH
+      </span>
+      <span class="ftitle">Brazilian CPF Number Hardcoded in Source</span>
+      <span class="fmeta">LLM06-CPF-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:43 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:78%</div>
+      <div class="code">    prompt = f&#34;&#34;&#34;
+    You are a helpful assistant for {user_name} ({user_email}).
+    User CPF: 123.456.789-00
+    
+    Answer the following question: {user_input}</div>
+      <div class="dl">Description</div><div>A Brazilian CPF tax number pattern was found hardcoded in source code. This is a LGPD-sensitive PII that must not appear in code or be sent to external LLM APIs.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Remove hardcoded CPF values. Mask PII before sending to external LLMs. Review LGPD compliance for your data processing pipeline.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">data_leak</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="high" id="f18">
+    <div class="hdr" onclick="tog(18)">
+      <span class="sbadge" style="background:#f9731620;color:#f97316;border:1px solid #f9731640">
+        🟠 HIGH
+      </span>
+      <span class="ftitle">Hardcoded API Key or Token</span>
+      <span class="fmeta">SEC-GENERIC-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/rag_app.py:23 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:82%</div>
+      <div class="code">
+# ❌ Hardcoded Anthropic API key (SEC-ANTHROPIC - CRITICAL)
+client = Anthropic(api_key=&#34;sk-ant-api03-realexposedkey12345678&#34;)
+
+# Global vector store (shared across all users — no tenant isolation)</div>
+      <div class="dl">Description</div><div>A generic API key or token appears to be hardcoded in source code.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use environment variables or a secrets manager. Never commit credentials to version control.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">secret_exposure</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="high" id="f19">
+    <div class="hdr" onclick="tog(19)">
+      <span class="sbadge" style="background:#f9731620;color:#f97316;border:1px solid #f9731640">
+        🟠 HIGH
+      </span>
+      <span class="ftitle">RAG: No Access Control on Document Retrieval</span>
+      <span class="fmeta">RAG-NOAC-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/rag_app.py:42 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:80%</div>
+      <div class="code">
+    # ❌ RAG retrieval with raw user input (no sanitization, no access control)
+    retrieved_docs = retriever.get_relevant_documents(user_input)
+
+    # ❌ Logging retrieved documents (may contain confidential data)</div>
+      <div class="dl">Description</div><div>The RAG retriever is called with raw user input without apparent access control. Any user may retrieve documents they are not authorized to see.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Implement per-user document filtering using metadata. Check user permissions before including retrieved documents in context.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">rag_security</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="high" id="f20">
+    <div class="hdr" onclick="tog(20)">
+      <span class="sbadge" style="background:#f9731620;color:#f97316;border:1px solid #f9731640">
+        🟠 HIGH
+      </span>
+      <span class="ftitle">Excessive Agency: Agent Has Filesystem Write/Delete Access</span>
+      <span class="fmeta">LLM08-FILE-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/rag_app.py:92 &nbsp;|&nbsp; LLM08 &nbsp;|&nbsp; conf:90%</div>
+      <div class="code">
+    llm = ChatOpenAI(model=&#34;gpt-4&#34;)
+    tools = [WriteFileTool()]  # ❌ Agent can write any file!
+
+    return initialize_agent(</div>
+      <div class="dl">Description</div><div>A file manipulation tool is registered to the agent. The LLM can write, move, or delete arbitrary files, potentially destroying data or writing malicious content.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Use read-only file tools. For write operations, require explicit human approval and restrict to a sandboxed directory.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">excessive_agency</span><span class="tag">llm08</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="medium" id="f21">
+    <div class="hdr" onclick="tog(21)">
+      <span class="sbadge" style="background:#eab30820;color:#eab308;border:1px solid #eab30840">
+        🟡 MEDIUM
+      </span>
+      <span class="ftitle">Sensitive Data Logged: LLM Prompt or Response</span>
+      <span class="fmeta">LLM06-LOG-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:49 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:72%</div>
+      <div class="code">
+    # ❌ VULNERABILITY 3: PII logged before LLM call (LLM06 - MEDIUM)
+    logger.info(f&#34;Calling LLM with prompt: {prompt}&#34;)
+
+    response = llm.invoke(prompt)</div>
+      <div class="dl">Description</div><div>Full LLM prompts or responses are being written to logs. These may contain PII, credentials, or business-sensitive data persisted without access controls.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Log only metadata (latency, token count, model name, session ID). Implement PII scrubbing if content logging is required.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">data_leak</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="medium" id="f22">
+    <div class="hdr" onclick="tog(22)">
+      <span class="sbadge" style="background:#eab30820;color:#eab308;border:1px solid #eab30840">
+        🟡 MEDIUM
+      </span>
+      <span class="ftitle">Sensitive Data Logged: LLM Prompt or Response</span>
+      <span class="fmeta">LLM06-LOG-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:61 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:72%</div>
+      <div class="code">
+    # ❌ VULNERABILITY 5: Response logged with full content (LLM06 - MEDIUM)
+    logger.debug(f&#34;LLM response: {result}&#34;)
+
+    return result</div>
+      <div class="dl">Description</div><div>Full LLM prompts or responses are being written to logs. These may contain PII, credentials, or business-sensitive data persisted without access controls.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Log only metadata (latency, token count, model name, session ID). Implement PII scrubbing if content logging is required.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">data_leak</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="medium" id="f23">
+    <div class="hdr" onclick="tog(23)">
+      <span class="sbadge" style="background:#eab30820;color:#eab308;border:1px solid #eab30840">
+        🟡 MEDIUM
+      </span>
+      <span class="ftitle">Excessive Agency: Agent Configured with High max_iterations</span>
+      <span class="fmeta">LLM08-MAXITER-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/langchain_chatbot.py:80 &nbsp;|&nbsp; LLM08 &nbsp;|&nbsp; conf:80%</div>
+      <div class="code">        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+        verbose=False,   # ❌ No audit trail
+        max_iterations=100,  # ❌ Runaway agent risk
+    )
+    return agent</div>
+      <div class="dl">Description</div><div>The agent is configured with a very high max_iterations value (50+). This increases the risk of runaway agents consuming resources or taking unintended actions.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Set max_iterations to 5-10 for most use cases. Add timeouts and cost limits.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">excessive_agency</span><span class="tag">llm08</span></div>
+    </div>
+  </div>
+  
+  <div class="card2" data-sev="medium" id="f24">
+    <div class="hdr" onclick="tog(24)">
+      <span class="sbadge" style="background:#eab30820;color:#eab308;border:1px solid #eab30840">
+        🟡 MEDIUM
+      </span>
+      <span class="ftitle">Sensitive Data Logged: LLM Prompt or Response</span>
+      <span class="fmeta">LLM06-LOG-001</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="loc">📍 examples/vulnerable_apps/rag_app.py:45 &nbsp;|&nbsp; LLM06 &nbsp;|&nbsp; conf:72%</div>
+      <div class="code">
+    # ❌ Logging retrieved documents (may contain confidential data)
+    logger.info(f&#34;Retrieved docs for prompt: {retrieved_docs}&#34;)
+
+    # Build context (all users get all documents — no RBAC)</div>
+      <div class="dl">Description</div><div>Full LLM prompts or responses are being written to logs. These may contain PII, credentials, or business-sensitive data persisted without access controls.</div>
+      
+      <div class="dl">Recommendation</div><div class="fix">💡 Log only metadata (latency, token count, model name, session ID). Implement PII scrubbing if content logging is required.</div>
+      
+      <div style="margin-top:.7rem"><span class="tag">data_leak</span><span class="tag">llm06</span></div>
+    </div>
+  </div>
+  
+  </div>
+</div>
+<footer>Generated by <strong>LLMAppShield v0.1.0</strong> — <a href="https://github.com/llmappshield/llmapp-shield">github.com/llmappshield</a> — Built with ❤️ in 🇧🇷 Brazil</footer>
+<script>
+function tog(id){document.getElementById('f'+id).classList.toggle('open')}
+function filt(s,btn){
+  document.querySelectorAll('.btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.card2').forEach(c=>{c.style.display=(s==='all'||c.dataset.sev===s)?'':'none'});
+}
+document.querySelectorAll('.card2[data-sev="critical"]').forEach(c=>c.classList.add('open'));
+</script>
+</body></html>

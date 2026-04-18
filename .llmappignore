@@ -1,0 +1,38 @@
+# .llmappignore — LLMAppShield ignore patterns
+# Works like .gitignore — paths matching these patterns are skipped during scan.
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.tox/
+
+# Test fixtures (known vulnerable examples used for testing)
+# Remove this if you want to scan your test code too
+# tests/fixtures/
+
+# Generated files
+*.min.js
+*.bundle.js
+*.chunk.js
+package-lock.json
+yarn.lock
+poetry.lock
+
+# IDE and OS
+.git/
+.idea/
+.vscode/
+.DS_Store
+
+# LLMAppShield own reports
+llmshield-report.html
+llmshield-report.json
