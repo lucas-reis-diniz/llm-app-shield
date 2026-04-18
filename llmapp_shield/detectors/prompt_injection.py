@@ -18,7 +18,6 @@ from __future__ import annotations
 import ast
 import re
 from pathlib import Path
-from typing import Any
 
 from llmapp_shield.detectors import BaseDetector
 from llmapp_shield.models import Finding, Rule, Severity, OWASPCategory

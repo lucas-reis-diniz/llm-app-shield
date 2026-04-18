@@ -36,7 +36,7 @@ class RuleLoader:
         for yaml_file in sorted(self.rules_dir.glob("*.yml")):
             try:
                 rules.extend(self._load_file(yaml_file))
-            except Exception as e:
+            except Exception:
                 # Don't crash on malformed rule files
                 pass
 

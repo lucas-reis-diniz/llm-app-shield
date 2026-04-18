@@ -12,17 +12,14 @@ Flow:
 
 from __future__ import annotations
 
-import ast
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 
-from llmapp_shield.models import Finding, ScanResult, Severity
+from llmapp_shield.models import Finding, ScanResult
 from llmapp_shield.rules.loader import RuleLoader
 from llmapp_shield.utils.ignore import IgnoreFilter
 from llmapp_shield.utils.file_utils import FileCollector

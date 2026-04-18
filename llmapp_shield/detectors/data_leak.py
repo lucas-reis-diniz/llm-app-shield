@@ -439,7 +439,7 @@ response = llm.invoke(safe_input)
 _FIX_SECRET_PROMPT = '''
 # ❌ VULNERABLE — Secret embedded in system prompt
 SYSTEM_PROMPT = f"""
-You are a helpful assistant. 
+You are a helpful assistant.
 DB Password: {os.environ["DB_PASSWORD"]}  # NEVER DO THIS
 API Key: sk-abc123secret
 """

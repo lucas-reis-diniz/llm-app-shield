@@ -11,13 +11,11 @@ Supports:
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from pathlib import Path
 from typing import Optional, TYPE_CHECKING
 
 from jinja2 import Environment, BaseLoader
 from rich import box
-from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
 from rich.rule import Rule

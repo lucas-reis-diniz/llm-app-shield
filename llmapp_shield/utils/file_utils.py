@@ -62,7 +62,7 @@ class FileCollector:
                 files.append(self.target)
         elif self.target.is_dir():
             files.extend(self._walk_directory(self.target, allowed_exts))
-        
+
         return sorted(set(files))
 
     def _walk_directory(self, directory: Path, allowed_exts: set[str]) -> list[Path]:

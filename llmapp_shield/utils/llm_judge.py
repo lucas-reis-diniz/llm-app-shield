@@ -28,7 +28,7 @@ Be conservative: when uncertain, mark as true positive.
 
 Finding:
 - Rule: {rule_id}
-- Title: {title}  
+- Title: {title}
 - Severity: {severity}
 - Code:
 {code_snippet}

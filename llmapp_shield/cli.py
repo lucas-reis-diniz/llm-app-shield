@@ -10,13 +10,11 @@ Provides the `llmapp-shield` command with subcommands:
 
 from __future__ import annotations
 
-import sys
 import time
 from pathlib import Path
 from typing import Optional
 
 import typer
-from rich import print as rprint
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
