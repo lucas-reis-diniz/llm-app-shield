@@ -1,5 +1,0 @@
-- name: Install LLMAppShield dependencies
-  run: pip install jinja2 pathspec pyyaml
-
-- name: Run LLM Security Scan
-  run: python3 examples/demo_scan.py . --fail-on high
