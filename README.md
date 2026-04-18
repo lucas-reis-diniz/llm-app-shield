@@ -357,6 +357,4 @@ MIT © 2026 LLMAppShield Contributors
 
 **⭐ Se esse projeto te ajudou, deixa uma estrela! Faz diferença para o open-source brasileiro.**
 
-Built with ❤️ in 🇧🇷 Brazil | [Twitter](https://twitter.com/llmappshield) | [Discord](https://discord.gg/llmappshield)
-
 </div>
