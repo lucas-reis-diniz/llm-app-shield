@@ -19,16 +19,8 @@ jobs:
       - name: Install dependencies
         run: pip install jinja2 pathspec pyyaml
 
-      - name: Copy scanner to project
-        run: |
-          # Baixa o demo_scan.py direto do seu repo ou de uma URL
-          # Se o arquivo já está no seu repo, apenas use o caminho
-          curl -sSL https://raw.githubusercontent.com/SEU_USER/llmapp-shield/main/examples/demo_scan.py -o llmshield.py
-          # OU se já está commitado:
-          # cp path/to/demo_scan.py llmshield.py
-
       - name: Run LLM Security Scan
-        run: python3 llmshield.py . --fail-on high --json scan-report.json
+        run: python3 tools/llmshield.py . --fail-on high --json scan-report.json
 
       - name: Upload report
         uses: actions/upload-artifact@v4
