@@ -179,6 +179,8 @@ class PromptInjectionDetector(BaseDetector):
                             detected_by="regex",
                         )
                     )
+            except re.error:
+                continue
         # AST-based: look for string concatenation involving "prompt" variables
         findings.extend(self._ast_detect_concat(source_code, file_path, lines))
         return findings
