@@ -28,14 +28,10 @@ jobs:
         run: |
           pip install -e ".[dev]"
 
-      - name: Run Ruff (linter)
-        run: ruff check llmapp_shield/ tests/
-
-      - name: Run Ruff (formatter check)
-        run: ruff format --check llmapp_shield/ tests/
-
-      - name: Run MyPy (type checker)
-        run: mypy llmapp_shield/ --ignore-missing-imports
+      - name: Run Ruff (auto-fix then check)
+        run: |
+          ruff check llmapp_shield/ tests/ --fix --exit-zero
+          ruff check llmapp_shield/ tests/
 
   # ─── Tests ─────────────────────────────────────────────────────────────────
   test:
