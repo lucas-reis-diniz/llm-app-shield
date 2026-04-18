@@ -10,13 +10,9 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator
-
-if TYPE_CHECKING:
-    from llmapp_shield.scanner import ScanConfig
-
 
 class Severity(str, Enum):
     """Severity levels for security findings."""

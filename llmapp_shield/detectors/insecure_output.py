@@ -31,7 +31,7 @@ _OWASP_LLM02 = OWASPCategory(
 
 # Variables that typically hold LLM output
 _LLM_OUTPUT_VARS = (
-    r"(?:llm_response|ai_response|model_response|completion|response|output|"
+    r"(?:llm_response|ai_response|aiResponse|llmResponse|modelResponse|model_response|completion|response|output|"
     r"generated|result|answer|generated_text|llm_output|ai_output|bot_response|"
     r"chat_response|gpt_response|claude_response)"
 )

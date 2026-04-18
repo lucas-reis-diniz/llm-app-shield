@@ -24,7 +24,7 @@ _OWASP = OWASPCategory(
 _SECRET_PATTERNS: list[tuple[str, str, str, Severity]] = [
     ("SEC-OPENAI-001", r"sk-[a-zA-Z0-9]{20,}", "OpenAI API key hardcoded", Severity.CRITICAL),
     ("SEC-OPENAI-PROJ-001", r"sk-proj-[a-zA-Z0-9_\-]{50,}", "OpenAI Project API key hardcoded", Severity.CRITICAL),
-    ("SEC-ANTHROPIC-001", r"sk-ant-[a-zA-Z0-9\-_]{50,}", "Anthropic API key hardcoded", Severity.CRITICAL),
+    ("SEC-ANTHROPIC-001", r"sk-ant-[a-zA-Z0-9\-_]{20,}", "Anthropic API key hardcoded", Severity.CRITICAL),
     ("SEC-GROQ-001", r"gsk_[a-zA-Z0-9]{50,}", "Groq API key hardcoded", Severity.CRITICAL),
     ("SEC-HUGGINGFACE-001", r"hf_[a-zA-Z0-9]{30,}", "HuggingFace token hardcoded", Severity.HIGH),
     ("SEC-COHERE-001", r"[a-zA-Z0-9]{40}(?=-cohere)", "Cohere API key pattern", Severity.HIGH),

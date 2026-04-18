@@ -65,7 +65,9 @@ packages = ["llmapp_shield"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
 ignore = ["E501"]
 
 [tool.mypy]

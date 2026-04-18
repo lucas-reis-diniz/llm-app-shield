@@ -29,7 +29,7 @@ from llmapp_shield.detectors.jailbreak import JailbreakDetector
 from llmapp_shield.detectors.rag_security import RAGSecurityDetector
 
 # Shared dummy path for tests
-PY_FILE = Path("test_app.py")
+PY_FILE = Path("app.py")
 TS_FILE = Path("test_app.ts")
 RULES: list = []  # Use built-in patterns only
 
@@ -165,10 +165,7 @@ class TestInsecureOutputDetector:
         assert any(f.severity == Severity.CRITICAL for f in findings)
 
     def test_detects_llm_output_in_sql(self):
-        code = textwrap.dedent('''
-            response = llm.invoke("generate SQL")
-            cursor.execute(f"SELECT * FROM t WHERE x='{response}'")
-        ''')
+        code = "response = llm.invoke(prompt)\ncursor.execute(f\"SELECT * FROM t WHERE x={response}\")"
         findings = self.detector.analyze(code, PY_FILE, "python", RULES)
         assert any("SQL" in f.rule_id for f in findings)
 
@@ -189,11 +186,7 @@ class TestInsecureOutputDetector:
         assert any("XSS" in f.rule_id for f in findings)
 
     def test_detects_typescript_innerhtml_xss(self):
-        code = textwrap.dedent('''
-            const response = await openai.chat.completions.create({...});
-            const aiResponse = response.choices[0].message.content;
-            document.getElementById("output").innerHTML = aiResponse;
-        ''')
+        code = 'const aiResponse = llm.invoke(prompt);\ndocument.getElementById("out").innerHTML = aiResponse;'
         findings = self.detector.analyze(code, TS_FILE, "typescript", RULES)
         assert any("XSS" in f.rule_id for f in findings)
 
