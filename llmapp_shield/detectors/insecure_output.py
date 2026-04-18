@@ -52,7 +52,7 @@ _PYTHON_DANGEROUS_OUTPUT_PATTERNS: list[tuple[str, str, str, Severity]] = [
     ),
     (
         "LLM02-SQL-001",
-        rf"(?:cursor\.execute|db\.execute|engine\.execute|session\.execute)\s*\(\s*(?:f[\"']|[\"'].*\{{){_LLM_OUTPUT_VARS}",
+        rf"(?:cursor\.execute|db\.execute|engine\.execute|session\.execute)\s*\(.*?{_LLM_OUTPUT_VARS}",
         "LLM output interpolated into SQL query (SQL Injection via LLM)",
         Severity.CRITICAL,
     ),

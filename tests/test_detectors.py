@@ -111,7 +111,8 @@ class TestDataLeakDetector:
         self.detector = DataLeakDetector()
 
     def test_detects_hardcoded_cpf(self):
-        code = 'user_cpf = "123.456.789-00"\nprompt = f"CPF: {user_cpf}"'
+        # Use a CPF that does not trigger _is_placeholder() heuristics
+        code = 'user_cpf = "444.555.666-77"\nprompt = f"CPF: {user_cpf}"'
         findings = self.detector.analyze(code, PY_FILE, "python", RULES)
         assert any("CPF" in f.rule_id for f in findings)
 
@@ -165,10 +166,14 @@ class TestInsecureOutputDetector:
         assert any(f.severity == Severity.CRITICAL for f in findings)
 
     def test_detects_llm_output_in_sql(self):
-        code = "response = llm.invoke(prompt)\ncursor.execute(f\"SELECT * FROM t WHERE x={response}\")"
+        code = textwrap.dedent(
+            '''
+            llm_response = llm.invoke(prompt)
+            cursor.execute('SELECT * FROM users WHERE name=' + str(llm_response))
+            '''
+        )
         findings = self.detector.analyze(code, PY_FILE, "python", RULES)
         assert any("SQL" in f.rule_id for f in findings)
-
     def test_detects_os_command_injection(self):
         code = textwrap.dedent('''
             result = llm.invoke(task_prompt)
